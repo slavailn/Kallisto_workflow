@@ -1,39 +1,78 @@
-## Creating transcript index
+# 📦 Creating a Transcript Index for Kallisto
 
-### Obtain a collection of transcripts
-We can either download an existing collection of transcripts or create one based on the genome fasta file and an annptation file in gtf or gff format.
----------
-1. Downloading an existing collection.
-   *Ensembl*
-    Navigate to Ensembl FTP
-    Select your species → release-XXX/fasta/<species>/cdna/
-    Download:
-   <species>.<assembly>.cdna.all.fa.gz
----------
-   *NCBI RefSeq*
-   Look for .rna.fna.gz files on the RefSeq FTP site if you need RefSeq-matching transcripts.
----------
-   *GENCODE (more curated for human/mouse)*
-   Visit: https://www.gencodegenes.org/
-   Choose your organism/version → Download the “Transcript sequences (FASTA)”
-   File: gencode.vXX.transcripts.fa.gz
----------
-2. Generate Transcriptome FASTA Yourself (Custom annotation/genome)
----------
-```
-   # Install gffread
-   mamba install -c bioconda gffread
+## 🔹 Step 1: Obtain a Collection of Transcripts
 
-   # Generate transcript sequences
-   gffread annotation.gtf \
-             -g genome.fa \
-             -w transcripts.fa
+You can either:
+
+- **Download** an existing transcript FASTA file (recommended for common organisms), or  
+- **Generate** a transcriptome FASTA yourself from a genome + GTF/GFF annotation.
+
+---
+
+### ✅ Option 1: Download Pre-Built Transcript FASTA
+
+#### 🔸 Ensembl
+- Go to the [Ensembl FTP site](https://ftp.ensembl.org/pub/)
+- Navigate to:  
+  `release-XXX/fasta/<species>/cdna/`
+- Download the file:  
+  ```
+  <species>.<assembly>.cdna.all.fa.gz
+  ```
+
+#### 🔸 NCBI RefSeq
+- Visit the [RefSeq FTP site](https://ftp.ncbi.nlm.nih.gov/)
+- Look for:
+  ```
+  *.rna.fna.gz
+  ```
+- These files contain transcript sequences aligned with RefSeq gene annotations.
+
+#### 🔸 GENCODE (Best for Human/Mouse)
+- Visit: [https://www.gencodegenes.org/](https://www.gencodegenes.org/)
+- Choose your species and release version.
+- Download:  
+  **Transcript sequences (FASTA)**  
+  ```
+  gencode.vXX.transcripts.fa.gz
+  ```
+
+---
+
+### ✅ Option 2: Generate Transcriptome FASTA Yourself
+
+This is useful for custom genomes or organisms without pre-built resources.
+
+```bash
+# Step 1: Install gffread (via mamba or conda)
+mamba install -c bioconda gffread
+
+# Step 2: Generate transcript FASTA from genome + annotation
+gffread annotation.gtf \
+        -g genome.fa \
+        -w transcripts.fa
 ```
----------
-3. Create kallisto index
-   ```
-   # *.idx - index
-   # transcripts.fa - fasta file with transcripts (created or downloaded from some repository)
-   kallisto index -i transcriptome.idx transcripts.fa
-   ```
- 
+
+---
+
+## 🔹 Step 2: Create Kallisto Index
+
+Once you have the transcript FASTA (either downloaded or generated):
+
+```bash
+# *.idx       → output index file
+# transcripts.fa → transcript FASTA file
+kallisto index -i transcriptome.idx transcripts.fa
+```
+
+---
+
+## 🧪 Example: GENCODE Mouse Transcriptome Index
+
+```bash
+# Download transcript FASTA from GENCODE FTP
+wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_mouse/latest_release/gencode.vM37.transcripts.fa.gz
+
+# Build kallisto index
+kallisto index -i gencode.vM37.idx gencode.vM37.transcripts.fa
+```
