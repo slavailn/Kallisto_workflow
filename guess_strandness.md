@@ -65,3 +65,94 @@ infer_experiment.py -r gene_model.bed -i sample.bam
 ```
 
 ---
+
+# 🧬 Interpreting `infer_experiment.py` Results for Paired-End RNA-Seq
+
+When you run **`infer_experiment.py`** from **RSeQC** on a **paired-end RNA-seq** experiment, it outputs a breakdown of how reads align relative to gene models. This helps you determine **library strandedness**.
+
+---
+
+## 🔍 Sample Output
+
+```text
+This is PairEnd Data
+Fraction of reads explained by "1++,1--,2+-,2-+": 0.0151
+Fraction of reads explained by "1+-,1-+,2++,2--": 0.9753
+Fraction of reads explained by others: 0.0096
+```
+
+---
+
+## ✅ Key Concepts
+
+RSeQC infers how the **strand of your reads** relates to the **strand of annotated transcripts** in your BED file.
+
+### 🔸 Pattern Groups
+
+| Group                          | Library Type                      | Interpretation                                      |
+|-------------------------------|-----------------------------------|-----------------------------------------------------|
+| `1++,1--,2+-,2-+`              | **FR** (non-stranded or forward)  | Read1 same strand as gene, Read2 opposite           |
+| `1+-,1-+,2++,2--`              | **RF** (reverse stranded)         | Read1 opposite strand as gene, Read2 same strand    |
+
+> - Numbers (1, 2) refer to **read mates** (R1 or R2).  
+> - `+/-` refers to strand orientation relative to transcript in BED.
+
+---
+
+## 📘 How to Interpret the Output
+
+### ✅ Reverse-Stranded Libraries (Most Common)
+
+```text
+Fraction explained by "1+-,1-+,2++,2--": ~0.95+
+```
+
+🟢 This indicates a **reverse-stranded (RF)** library. Use:
+
+```bash
+--rna-strandness RF
+```
+
+---
+
+### ✅ Forward-Stranded Libraries
+
+```text
+Fraction explained by "1++,1--,2+-,2-+": ~0.95+
+```
+
+🟢 This indicates a **forward-stranded (FR)** library. Use:
+
+```bash
+--rna-strandness FR
+```
+
+---
+
+### ✅ Unstranded Libraries
+
+```text
+Both fractions close to 0.5 or neither dominates
+```
+
+🟡 This suggests an **unstranded** library. Use:
+
+```bash
+--rna-strandness unstranded
+```
+
+or omit strand-specific options.
+
+---
+
+## 🚨 Caveats
+
+- Use a **BED12** file with accurate strand info.
+- Ambiguously mapped reads may affect the outcome.
+- Best results come from **uniquely mapped, properly paired reads**.
+
+---
+
+
+
+
